@@ -1,0 +1,178 @@
+@import 'config';
+
+.input-group {
+  $border-radius: 4px;
+
+  font-size: 90%;
+  display: block;
+  user-select: none;
+  position: relative;
+  margin: 20px 0 10px 0;
+
+  &[disabled] {
+    opacity: 0.6;
+  }
+  &[disabled],
+  &[disabled] * {
+    user-select: none;
+    cursor: not-allowed;
+  }
+
+  input {
+    font-size: 100%;
+    padding: 10px;
+    display: block;
+    width: 100%;
+    border: none;
+    background-color: $color-body;
+    border-radius: $border-radius;
+    border-bottom: 1px solid #ccc;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__label {
+    font-size: 100%;
+    position: absolute;
+    user-select: none;
+    pointer-events: none;
+    left: 5px;
+    top: 5px;
+    padding: 5px 14px 5px 0;
+    background-color: $color-body;
+    transition: 0.2s ease all;
+    border-radius: $border-radius;
+    will-change: top, transform, opacity;
+  }
+
+  // bottom bars
+  &__bar {
+    position: relative;
+    display: block;
+    width: 100%;
+
+    &:before,
+    &:after {
+      content: '';
+      transition: 0.2s ease all;
+      background: $color-secondary;
+      @include wh(0px, 2px, absolute bottom);
+      will-change: top, transform, opacity, background;
+    }
+    &:before { left: 50%; }
+    &:after { right: 50%; }
+  }
+
+  &__after {
+    z-index: 2;
+    opacity: 0.7;
+    font-size: 100%;
+    line-height: 1.2;
+    text-align: right;
+    will-change: opacity;
+    @include wh(50px, auto, bottom 10px right);
+  }
+
+  &__error {
+    z-index: -1;
+    width: 100%;
+    top: 0;
+    font-size: 12px;
+    color: $color-error;
+    position: relative;
+    margin-top: 0;
+    opacity: 0;
+    display: block;
+    transition: 0.3s ease;
+  }
+
+  &__number-buttons {
+    $size-button:   35px;
+    $size-icon:     16px;
+    $color-button:  Color(#fff, -30%);
+    $color-icon:    $color-text;
+    $gutter:        3px;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-radius: $config-border-radius / 5;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    // background-color: #fff;
+    @include wh($size-button * 2 + $gutter, 100%, top (-2px) right);
+    
+    &--plus,
+    &--minus {
+      display: block;
+      color: $color-icon;
+      transition: 0.1s ease;
+      background-color: $color-button;
+      @include wh($size-button, $size-button / 1.5, relative top);
+      top: 5px;
+      // @include xs(height, $size-button);
+
+      &:before {
+        content: '';
+        display: block;
+        text-align: center;
+        font-size: $size-icon;
+        transition: 0.2s ease;
+        @include wh($size-icon, true, middle center);
+      }
+
+      &:hover {
+        color: $color-secondary-text;
+        background-color: $color-secondary;
+      }
+      &:active {
+        color: $color-secondary-text;
+        background-color: Color($color-secondary, -10%);
+        transform: scale(0.8);
+      }
+    }
+    :first-child {
+      margin-right: $gutter;
+    }
+    &--plus:before { content: '+'; }
+    &--minus:before { content: '-'; }
+  }
+
+  // active state
+  input:required ~ &__label,
+  input:focus ~ &__label,
+  .no-js & input:valid ~ &__label,
+  &--focused &__label {
+    top: -15px;
+    font-size: 12px;
+    color: #646464;
+  }
+
+  input:focus ~ &__bar:before,
+  input:focus ~ &__bar:after {
+    width: 50%;
+  }
+
+  &--error {
+    margin-bottom: 0;
+  }
+  &--error &__error {
+    opacity: 1;
+    z-index: 2;
+    margin-top: 5px;
+  }
+  &--inline {
+    display: inline-block;
+  }
+  &--transparent {
+    input {
+      background-color: transparent;
+    }
+  }
+  &--transparent &__label {
+    background-color: transparent;
+  }
+}

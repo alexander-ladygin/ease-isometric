@@ -1,10 +1,14 @@
-@import 'special';
-@import 'range';
+@import 'config';
+@import 'material-input';
 
 
 $button-size:            40px;
 $button-gutter:          5px;
-$button-icon-size:       100%;
+$button-icon-size:       80%;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
 
 .buttons-wrapper {
   position: relative;
@@ -28,6 +32,9 @@ $button-icon-size:       100%;
 
   svg {
     @include wh($button-icon-size, middle center);
+    path {
+      fill: #34343e;
+    }
   }
 
   &:hover {
@@ -38,4 +45,11 @@ $button-icon-size:       100%;
     transform: translateY(0px);
     box-shadow: 0px 0px 2px rgba(#000, 0.4);
   }
+}
+
+.flex-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 }
