@@ -1,0 +1,41 @@
+@import 'special';
+@import 'range';
+
+
+$button-size:            40px;
+$button-gutter:          5px;
+$button-icon-size:       100%;
+
+.buttons-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.button-icon {
+  display: block;
+  cursor: pointer;
+  border-radius: 7px;
+  transition: 0.2s ease;
+  margin-right: $button-gutter;
+  @include wh($button-size, top relative);
+
+  &:last-of-type {
+    margin-right: 0;
+  }
+
+  svg {
+    @include wh($button-icon-size, middle center);
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 2px 5px rgba(#000, 0.4);
+  }
+  &:active {
+    transform: translateY(0px);
+    box-shadow: 0px 0px 2px rgba(#000, 0.4);
+  }
+}

@@ -1,0 +1,400 @@
+
+// width (or, and) height
+    @mixin wh($width: inherit, $height: $width, $line-height: null, $setPos: null) {
+        @if (type-of($width) == list and length($width) == 2) {
+            $w: list-get-nth(1, $width);
+            $h: list-get-nth(2, $width);
+            width: $w;
+            height: $h;
+            @if (type-of($height) == list) {
+                @include setPos($height, $w $h);
+                @if ($line-height == true) {
+                    line-height: $h;
+                }
+                    @else if (type-of($line-height) == number) {
+                        line-height: $line-height;
+                    }
+            }
+                @else if ($height == true) {
+                    line-height: $h;
+                    @if ($setPos != null) {
+                        @include setPos($setPos, $w $h);
+                    }
+                }
+                @else if (type-of($line-height) == number) {
+                    line-height: $line-height;
+                }
+        }
+            @else if (type-of($height) == list) {
+                width: $width;
+                height: $width;
+                @include setPos($height, $width);
+            }
+            @else if ($height == true) {
+                width: $width;
+                height: $width;
+                line-height: $width;
+                @if ($line-height != null) {
+                    @include setPos($line-height, $width);
+                }
+            }
+                @else {
+                    @if ($width != x) { width: $width; }
+                        @if ($height != x) { height: $height; }
+                    @if ($line-height == true) {
+                        line-height: $height;
+                        @if ($setPos != null) {
+                            @include setPos($setPos, $width $height);
+                        }
+                    }
+                        @else if (type-of($line-height) == number) {
+                            line-height: $line-height;
+                            @if ($setPos != null) {
+                                @include setPos($setPos, $width $height);
+                            }
+                        }
+                        @else if ($line-height == relative or $line-height == absolute or $line-height == fixed or $line-height == static or $line-height == sticky or  $line-height == unset) {
+                            position: $line-height;
+                        }
+                        @else if (type-of($line-height) == list) {
+                            @include setPos($line-height, $width $height);
+                        }
+                }
+    }
+
+// position
+    @mixin pos($p_prop: relative, $p_values: null null null null) {
+        $params: ();
+        @if ( length($p_prop) > 1 ) {
+            $params: $p_prop;
+        }
+            @else {
+                @if ($p_prop != x) {
+                    position: $p_prop;
+                }
+                @if ( length($p_values) == 1 ) {
+                    $p_values: $p_values null null null;
+                }
+                    @else if ( length($p_values) == 2 ) {
+                        $p_values: $p_values null null;
+                    }
+                    @else if ( length($p_values) == 3 ) {
+                        $p_values: $p_values null;
+                    }
+                $params: $p_values;
+            }
+        $names: top right bottom left;
+        @each $prop in $names {
+            $i: index($names, $prop);
+            $val: nth($params, $i);
+            @if ( $val != x ) {
+                #{nth($names, $i)}: $val;
+            }
+        }
+    }
+
+// set position
+    @mixin setPos($position: x, $wh: 0) {
+        // default values: @include setPos(middle center, 30px);
+        @if ($position != x) {
+
+            $presets: top right bottom left;
+            $wh-length: length($wh);
+            $check-pos: false;
+            $break: false;
+            $property: x;
+            $unit: px;
+            $size: x;
+
+            @each $pos in $position {
+                @if ($break == false) {
+                    $p-index: index($position, $pos);
+                    $wh-index: 1;
+                    @if ($pos == absolute or $pos == relative or $pos == fixed or $pos == static) {
+                        position: #{$pos};
+                        $check-pos: true;
+                    }
+                        @else if ($pos == top or $pos == right or $pos == bottom or $pos == left) {
+                            $next-value: ();
+                            @if $p-index + 1 <= length($position) { $next-value: nth($position, $p-index + 1); }
+                            @if (type-of($next-value) == number) {
+                                #{$pos}: $next-value;
+                                $break: true;
+                            }
+                                @else{
+                                    #{$pos}: 0;
+                                    $break: false;
+                                }
+                        }
+                            @else {
+                                $break: false;
+                                @if ($pos == middle) {
+                                    $property: nth($presets, 1);
+                                    $wh-index: 2;
+                                }
+                                    @else if ($pos == center) {
+                                        $property: nth($presets, 4);
+                                        $wh-index: 1;
+                                    }
+
+                                @if ($wh-length == 1) { $size: $wh; }
+                                    @else if ($wh-length == 2) { $size: nth($wh, $wh-index); }
+
+                                @if ($size != x) {
+                                    @if (unit($size) == px) {
+                                        #{$property}: 50%;
+                                        #{'margin-' + $property}: -$size / 2;
+                                    }
+                                        @else if (unit($size) == '%') {
+                                            #{$property}: (100 - $size) / 2;
+                                        }
+                                }
+                            }
+                }
+                    @else {
+                        $break: false;
+                    }
+            }
+            @if ($check-pos == false) {
+                position: absolute;
+            }
+
+        }
+    }
+
+// extend
+    @mixin extend ($selector) {
+        @extend #{$selector};
+    }
+
+// others
+    @mixin vendor($prefixs: x, $property: x, $value: x) {
+        @if ($prefixs != x) {
+            @each $i in $prefixs {
+                $prefix-i: nth( $prefixs, index($prefixs, $i) );
+                #{'-' + $prefix-i + '-' + $property}: $value;
+            }
+        }
+        #{$property}: $value;
+    }
+
+
+    @mixin severalBySuffix ($property: x, $property-suffix: x, $value: 0) {
+        // $property:         margin
+        // $property-suffix:  top bottom
+        // $value:            10px
+        // result:
+            // margin-top: 10px
+            // margin-bottom: 10px
+        @if $property != x {
+            @each $suffix in $property-suffix {
+                #{ $property + '-' + $suffix }: $value;
+            }
+        }
+    }
+
+
+    @mixin severalProps ($list-property: x, $value: 0) {
+        // $property:         font-size color line-height
+        // $value:            inherit
+        // result:
+            // font-size: inherit
+            // color: inherit
+            // line-height: inherit
+        @if $list-property != x {
+            @each $property in $list-property {
+                #{ $property }: $value;
+            }
+        }
+    }
+
+    @mixin setPropOfTheMap ($map: null, $ignore-keys: null) {
+        @if ($map != null and type-of($map) == map) {
+            @each $ignore-key in $ignore-keys {
+                $map: map-remove($map, $ignore-key);
+            }
+            $keys: map-keys($map);
+            @each $prop in $keys {
+                #{$prop}: map-get($map, $prop);
+            }
+        }
+            @else {
+                @warn '$map: #{$map}';
+                @if (type-of($map) != map) {
+                    @warn 'argument `$map` of setPropOfTheMap($map, $ignore-keys) must be a map!';
+                }
+            }
+    }
+
+    @mixin la-animation ($animate...) {
+        $max: length($animate);
+        $animations: '';
+        @for $i from 1 through $max {
+            $animations: #{$animations + nth($animate, $i)};
+            @if $i < $max {
+                $animations: #{$animations + ', '};
+            }
+        }
+        animation: $animations;
+    }
+
+    @mixin la-keyframes ($animationName) {
+        @-webkit-keyframes #{$animationName} {
+            @content;
+        }
+        @-moz-keyframes #{$animationName} {
+            @content;
+        }
+        @-o-keyframes #{$animationName} {
+            @content;
+        }
+        @keyframes #{$animationName} {
+            @content;
+        }
+    }
+
+    @mixin la-animkeys ($animationName, $properties...) {
+        animation: $animationName $properties;
+        @at-root {
+            @include la-keyframes($animationName) {
+                @content;
+            }
+        }
+    }
+
+    @mixin bg($color: x, $url: x, $repeat: no-repeat, $position: center, $size: cover, $attachment: x) {
+        @if ($color != x) { background-color: $color; }
+        @if ($url != x) { background-image: url($url); }
+        @if ($repeat == x) { background-repeat: no-repeat; }
+            @else { background-repeat: $repeat; }
+        @if ($position == x) { background-position: center; }
+            @else { background-position: $position; }
+        @if ($size == x) {$size: cover;}
+        @include vendor(webkit moz o, background-size, $size);
+        @if ($attachment != x) {
+            background-attachment: $attachment;
+        }
+    }
+
+
+
+    // get color 
+        // Global variables map => $app-colors;
+        // EXAMPLE:
+        //    $app-colors: ( brand-first: #00c8ff, brand-last: #232323 );
+        //    Color(brand-first);
+        //    return #00c8ff;
+        @function Color ($key: x, $modificator: x, $modificatorForOpacity: x) {
+            $color: ();
+            @if ($key == random) {
+                // @if ($modificator == red or $modificator == green $modificator == blue) {
+                    // @if ($modificatorForOpacity) {
+                    //     $color: rgba(, $modificatorForOpacity);
+                    // }
+                    // $color: rgb
+                // }
+                // @if ($modificator == list) {
+                //     $clr: (
+                //         red: 0,
+                //         green: 0,
+                //         blue: 0
+                //     );
+                //     @each $name in $modificator {
+                //         $start: nth($modificator, index($name + 1));
+                //         @if (type-of($start) == number) {
+                //             $end:   nth($modificator, index($name + 2));
+                //         }
+                //             @else { $end: 256; }
+                //         map-merge($clr, ($name: random(start) ));
+                //     }
+                // }
+            }
+                @else if ($modificator == debug) {
+                    $color: get-key($app-colors, $key);
+                    @debug $color;
+                    @return $color;
+                }
+                @else {
+                    @if (type-of($key) == color) {
+                        $color: $key;
+                    }
+                        @else if (type-of($key) == list and type-of($modificator) == color) {
+                            $color: get-key($app-colors, $key, $modificator);
+                            $modificator: $modificatorForOpacity;
+                        }
+                            @else {
+                                $color: get-key($app-colors, $key);
+                            }
+                    @if ($key == x) {
+                        @return false;
+                    }
+                    @if ($modificator != x) {
+                        @if ($modificator == invert) {
+                            $color: invert($color);
+                        }
+                            @else if (unit($modificator) == '%') {
+                                @if ($modificator < 0) {
+                                    @if (type-of($color) != color) { @warn 'LA-sass => Color() => $key: #{$key}'; }
+                                    @if ($modificator < -100) { $modificator: -100; }
+                                    $color: darken($color, $modificator * -1);
+                                }
+                                    @else if ($modificator >= 0) {
+                                        @if (type-of($color) != color) { @warn 'LA-sass => Color() => $key: #{$key}'; }
+                                        @if ($modificator > 100) { $modificator: 100; }
+                                        $color: lighten($color, $modificator);
+                                    }
+                            }
+                                @else {
+                                    $color: rgba($color, $modificator);
+                                }
+                    }
+                }
+            @return $color;
+        }
+
+
+
+@mixin set-delay-each ($property: transition, $time-counter: 0.5, $start: 1, $end: 10, $nth: of-type) {
+    $time: $time-counter;
+
+    @for $i from $start through $end {
+        &#{':nth-#{$nth}(#{$i})'} {
+            #{'#{$property}-delay'}: $time + s;
+        }
+        $time: $time + $time-counter;
+    }
+}
+
+
+@mixin la-clearfix($pseudo: after) {
+    $selector: '&';
+    @if ($pseudo != null) { $selector: '&:' + $pseudo; }
+    #{$selector} {
+        content: " ";
+        clear: both;
+        height: 1px;
+        display: table;
+        margin-top: -1px;
+        visibility: hidden;
+    }
+}
+
+
+
+// @mixin la-mq($max: x, $min: x, $attr: width, $and: '') {
+//     @if ($max != x and $min != x) {
+//         @media only screen and (#{'min-' + $attr}: $min) and (#{'max-' + $attr}: $max) #{$and} {
+//             @content;
+//         }
+//     }
+//         @else if ($min == x) {
+//             @media only screen and (#{'max-' + $attr}: $max) #{$and} {
+//                 @content;
+//             }
+//         }
+//         @else if ($max == x) {
+//             @media only screen and (#{'min-' + $attr}: $min) #{$and} {
+//                 @content;
+//             }
+//         }
+// }

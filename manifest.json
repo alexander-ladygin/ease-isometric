@@ -1,0 +1,7 @@
+{
+  "name": "Ease Isometric",
+  "id": "887297527562833401",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html"
+}
