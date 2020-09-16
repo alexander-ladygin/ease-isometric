@@ -1,5 +1,7 @@
-[Ease isometric poster](src/img/ease_isometric_poster.jpg)
+![Ease isometric poster](src/img/ease_isometric_poster.jpg)
 
-## Create isometric objects quickly and easily!
+# Create isometric objects quickly and easily!
 
-[Ease isometric poster](src/img/ease-isometric-interface.jpg)
+## User interface:
+
+![Ease isometric poster](src/img/ease-isometric-interface.jpg)
