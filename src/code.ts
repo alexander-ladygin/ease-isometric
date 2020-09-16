@@ -89,16 +89,6 @@ figma.ui.onmessage = msg => {
     }
     case 'isometric-left': {
       for (const node of figma.currentPage.selection) {
-        // let angle = 45;
-        // let rValue = Math.cos(angle * (Math.PI / 180));
-        // let sValue = Math.tan(angle * (Math.PI / 180));
-
-        // node.resize(node.width, node.height * rValue);
-        // node.relativeTransform = [
-        //   [node.relativeTransform[0][0], node.relativeTransform[0][1], node.relativeTransform[0][2]],
-        //   [sValue, node.relativeTransform[1][1], node.relativeTransform[1][2]]
-        // ];
-        // node.rotation = -angle;
         let parent = node.parent;
         let idx = parent.children.indexOf(node);
         let center = getCenter(node);

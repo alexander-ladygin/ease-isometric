@@ -5,8 +5,7 @@
   "main": "code.js",
   "scripts": {
     "dev": "npx webpack --mode=development --watch",
-    "prod": "npx webpack --mode=production",
-    "build": "tsc -p tsconfig.json"
+    "build": "npx webpack --mode=production"
   },
   "author": "Ladyginpro",
   "license": "ISC",
