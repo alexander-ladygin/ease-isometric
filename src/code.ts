@@ -1,6 +1,10 @@
 figma.showUI(__html__);
 figma.ui.resize(190, 160);
 
+const settingsDefault = {
+  moveValue: 10
+};
+
 const wVal = 1.22465;
 const hVal = 0.7070;
 
@@ -29,6 +33,22 @@ function reflectY (node) {
     [node.relativeTransform[0][0], node.relativeTransform[0][1], node.relativeTransform[0][2]],
     [node.relativeTransform[1][0], node.relativeTransform[1][1] * -1, node.relativeTransform[1][2] + node.height]
   ];
+}
+
+async function loadSettings() {
+  let userOptions = await figma.clientStorage.getAsync('settings');
+
+  if (userOptions) {
+    return JSON.parse(userOptions);
+  } else {
+    await figma.clientStorage.setAsync('settings', JSON.stringify(settingsDefault));
+    return settingsDefault;
+  }
+}
+
+async function saveSettings (data) {
+  await figma.clientStorage.setAsync('settings', JSON.stringify(data));
+  return 'saved';
 }
 
 figma.ui.onmessage = msg => {
@@ -143,6 +163,28 @@ figma.ui.onmessage = msg => {
         node.x += val * Math.sin( mathRadians(angle % 360) );
         node.y -= val * Math.cos( mathRadians(angle % 360) );
       }
+      break;
+    }
+    case 'loadSettings': {
+      let settings = loadSettings()
+        .then(settings => {
+          figma.ui.postMessage({
+            type: 'applyToHTMLSettings',
+            settings: settings
+          });
+        });
+
+      break;
+    }
+    case 'saveSettings': {
+      saveSettings(msg.settings)
+        .then((message) => {
+          figma.ui.postMessage({
+            type: 'settingsSaved',
+            message: 'Settings saved! ;)'
+          });
+        });
+
       break;
     }
   }
