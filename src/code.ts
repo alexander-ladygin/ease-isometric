@@ -1,5 +1,5 @@
 figma.showUI(__html__);
-figma.ui.resize(190, 160);
+figma.ui.resize(190, 225);
 
 const settingsDefault = {
   moveValue: 10

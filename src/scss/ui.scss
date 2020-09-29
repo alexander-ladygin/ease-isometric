@@ -10,6 +10,19 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+p {
+  font-size: 12px;
+  text-align: left;
+}
+
+$width: 100 90 80 70 50 40 30 25 10;
+@each $w in $width {
+  .w-#{$w} {
+    display: block;
+    width: #{$w + '%'};
+  }
+}
+
 .buttons-wrapper {
   position: relative;
   display: flex;
@@ -52,4 +65,31 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+}
+
+
+.section-title {
+  width: 100%;
+  height: auto;
+  display: block;
+  text-align: left;
+  padding: 0;
+  width: 100%;
+  overflow: hidden;
+  margin: 10px 0 5px 0;
+  user-select: none;
+  pointer-events: none;
+
+  span {
+    position: relative;
+    display: inline-block;
+
+    &:before {
+      content: '';
+      display: block;
+      margin-left: 5px;
+      background-color: #cecece;
+      @include wh(500px, 1px, middle left 100%);
+    }
+  }
 }
