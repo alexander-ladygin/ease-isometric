@@ -90,18 +90,27 @@ document.getElementById('move-value').addEventListener('change', function (e) {
 document.getElementById('move-value').addEventListener('keydown', inputNumberRound);
 document.getElementById('move-value').addEventListener('mousewheel', inputNumberRound);
 
-document.getElementById('move-top-right').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'move-top-right', value: moveGetValue() } }, '*')
+function moveClickHandler (e) {
+  parent.postMessage({ pluginMessage: { type: this.id, value: moveGetValue() } }, '*');
+}
+function moveMouseWheelHandler (e) {
+  let delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
+  let reType = this.id === 'move-top-right' ? 'move-bottom-left' : (
+    this.id === 'move-top-left' ? 'move-bottom-right' : (
+      this.id === 'move-bottom-left' ? 'move-top-right' : 'move-top-left'
+    )
+  );
+  parent.postMessage({ pluginMessage: { type: delta > 0 ? this.id : reType, value: moveGetValue() } }, '*');
 }
 
-document.getElementById('move-top-left').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'move-top-left', value: moveGetValue() } }, '*')
-}
+document.getElementById('move-top-right').addEventListener('click', moveClickHandler);
+document.getElementById('move-top-right').addEventListener('mousewheel', moveMouseWheelHandler);
 
-document.getElementById('move-bottom-left').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'move-bottom-left', value: moveGetValue() } }, '*')
-}
+document.getElementById('move-top-left').addEventListener('click', moveClickHandler);
+document.getElementById('move-top-left').addEventListener('mousewheel', moveMouseWheelHandler);
 
-document.getElementById('move-bottom-right').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'move-bottom-right', value: moveGetValue() } }, '*')
-}
+document.getElementById('move-bottom-left') .addEventListener('click', moveClickHandler);
+document.getElementById('move-bottom-left').addEventListener('mousewheel', moveMouseWheelHandler);
+
+document.getElementById('move-bottom-right').addEventListener('click', moveClickHandler);
+document.getElementById('move-bottom-right').addEventListener('mousewheel', moveMouseWheelHandler);
