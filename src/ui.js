@@ -114,3 +114,7 @@ document.getElementById('move-bottom-left').addEventListener('mousewheel', moveM
 
 document.getElementById('move-bottom-right').addEventListener('click', moveClickHandler);
 document.getElementById('move-bottom-right').addEventListener('mousewheel', moveMouseWheelHandler);
+
+document.getElementById('object-tube').addEventListener('click', function (e) {
+  parent.postMessage({ pluginMessage: { type: this.id } }, '*');
+});
