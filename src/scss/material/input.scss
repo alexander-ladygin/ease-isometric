@@ -47,6 +47,11 @@
     transition: 0.2s ease all;
     border-radius: $border-radius;
     will-change: top, transform, opacity;
+
+    &--right {
+      left: auto;
+      right: 0;
+    }
   }
 
   // bottom bars

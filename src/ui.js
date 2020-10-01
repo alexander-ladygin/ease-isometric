@@ -1,4 +1,5 @@
 import './scss/ui.scss'
+import { radioCustomSwitch, radioCustomCallbacks } from './ui_js/radio-custom'
 import { sectionOpen, sectionClose, sectionOptions, sectionEditAllClose } from './ui_js/sections'
 
 // user settings
@@ -32,13 +33,20 @@ function saveSettings() {
   parent.postMessage({ pluginMessage: {
     type: 'saveSettings',
     settings: {
-      moveValue: +document.getElementById('move-value').value
+      moveValue: +document.getElementById('move-value').value || 0,
+      tube: {
+        value: +document.getElementById('tube-value').value || 0,
+        anchor: document.querySelector('.tube-anchor.radio-custom--checked').getAttribute('id') || 'tube-anchor-top',
+      },
     }
   } }, '*');
 }
 
 function applyToHTMLSettings (data) {
+  data.tube = data.tube || data.default.tube;
   document.getElementById('move-value').value = data.moveValue;
+  document.getElementById('tube-value').value = data.tube.value;
+  radioCustomSwitch(document.getElementById(data.tube.anchor));
 }
 
 function inputNumberRound (e) {
@@ -77,6 +85,11 @@ function inputNumberRound (e) {
 
   let eventChange = new Event('change');
   node.dispatchEvent(eventChange);
+}
+
+// radioCustom
+radioCustomCallbacks.saveSettings = function (node) {
+  saveSettings();
 }
 
 // isometric
@@ -138,12 +151,21 @@ document.getElementById('object-tube').addEventListener('click', function (e) {
 });
 
 function objectTubeGetProps (mode) {
+  saveSettings();
+
   return {
     mode: mode,
     type: 'object-tube-change',
+    anchor: document.querySelector('.tube-anchor.radio-custom--checked').getAttribute('id'),
     value: +document.getElementById('tube-value').value,
   }
 }
+
+document.getElementById('tube-value').addEventListener('change', function (e) {
+  saveSettings();
+});
+document.getElementById('tube-value').addEventListener('keydown', inputNumberRound);
+document.getElementById('tube-value').addEventListener('mousewheel', inputNumberRound);
 
 document.getElementById('tube-change-plus').addEventListener('click', function (e) {
   parent.postMessage({ pluginMessage: objectTubeGetProps('+') }, '*');

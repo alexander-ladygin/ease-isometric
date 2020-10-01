@@ -4,7 +4,11 @@ figma.showUI(__html__);
 figma.ui.resize(200, 235);
 
 const settingsDefault = {
-  moveValue: 10
+  moveValue: 10,
+  tube: {
+    value: 10,
+    anchor: 'tube-anchor-top',
+  }
 };
 
 const wVal = 1.22465;
@@ -22,6 +26,7 @@ const objectsData = {
   pluginData: {
     key: 'ease-isometric-objects'
   },
+  appendToFrame: false,
   tube: {
     min: 30,
     w: 100,
@@ -205,6 +210,10 @@ function moveToCenterScreen (node) {
   return node;
 }
 
+function getFrameParent (node) {
+  return (node.type === 'FRAME' || node.type === 'PAGE') ? node : getFrameParent(node.parent);
+}
+
 async function loadSettings() {
   let userOptions = await figma.clientStorage.getAsync('settings');
 
@@ -288,6 +297,11 @@ figma.ui.onmessage = msg => {
       break;
     }
     case 'object-tube': {
+      let frameInSelection;
+      if (objectsData.appendToFrame && figma.currentPage.selection) {
+        frameInSelection = getFrameParent(figma.currentPage.selection[0]);
+      }
+
       let tube = figma.createVector(),
         tubeWidth = 100,
         oData = objectsData.tube,
@@ -309,9 +323,11 @@ figma.ui.onmessage = msg => {
         opacity: 1,
         color: hexToRGB('#000')
       }];
+
       moveToCenterScreen(tube);
 
-      let circleSize = 60,
+      let circleSize = 76,
+        circleInnerSize = 0.7,
         circle = figma.createEllipse();
 
       circle.fills = [{
@@ -319,15 +335,37 @@ figma.ui.onmessage = msg => {
         opacity: 1,
         color: hexToRGB('#fff')
       }];
-      circle.resizeWithoutConstraints(circleSize, circleSize);
-      circle.x = tube.x + (tubeWidth - circleSize) / 2;
-      circle.y = tube.y - 1;
+      circle.resizeWithoutConstraints(circleSize * circleInnerSize, circleSize * circleInnerSize);
+      circle.x = tube.x + (tubeWidth - circleSize * circleInnerSize) / 2;
+      circle.y = tube.y + 3;
       isometricTop(circle);
 
-      let boolop = figma.subtract([circle], tube.parent);
+      let circleOutline = figma.createEllipse();
+
+      circleOutline.fills = [];
+      circleOutline.strokes = [{
+        type: 'SOLID',
+        opacity: 1,
+        color: hexToRGB('#fff')
+      }];
+      circleOutline.strokeAlign = 'INSIDE';
+      circleOutline.strokeWeight = 2;
+      circleOutline.resizeWithoutConstraints(circleSize, circleSize);
+      circleOutline.x = tube.x + (tubeWidth - circleSize) / 2;
+      circleOutline.y = tube.y - 9;
+      isometricTop(circleOutline);
+
+      let boolop = figma.subtract([circleOutline, circle], tube.parent);
       inLayersInsertTo([boolop], tube, 'before');
       boolop.appendChild(tube);
-      inLayersBringTo(circle, 'start');
+      inLayersBringTo(tube, 'end');
+
+      if (objectsData.appendToFrame && frameInSelection && frameInSelection.type === 'FRAME') {
+        frameInSelection.appendChild(boolop);
+        inLayersBringTo(boolop, 'start');
+        boolop.x = frameInSelection.width / 2 - boolop.width / 2;
+        boolop.y = frameInSelection.height / 2 - boolop.height / 2;
+      }
 
       boolop.setPluginData(objectsData.pluginData.key, oData.pluginData.name);
       figma.currentPage.selection = [boolop];
@@ -339,10 +377,11 @@ figma.ui.onmessage = msg => {
         if (node.getPluginData(objectsData.pluginData.key) === objectsData.tube.pluginData.name) {
           if (node.type === 'BOOLEAN_OPERATION') {
             if (node.children[0].type === 'VECTOR') {
-              let vector = node.children[0],
-              path = vector.vectorPaths[0],
-              data = path.data,
-              dataArr = data.split(' ');
+              let nodeHeight = node.height,
+                vector = node.children[0],
+                path = vector.vectorPaths[0],
+                data = path.data,
+                dataArr = data.split(' ');
         
               if (dataArr.length > 47) {
                 let value = +msg.value, arr_val;
@@ -369,6 +408,25 @@ figma.ui.onmessage = msg => {
                   windingRule: 'EVENODD',
                   data: dataArr.join(' '),
                 }];
+
+                switch (msg.anchor.replace('tube-anchor-', '')) {
+                  case 'center': {
+                    if (msg.mode === '=') {
+                      node.y -= (node.height - nodeHeight) / 2;
+                    } else {
+                      node.y += (value / (msg.mode === '-' ? 2 : -2));
+                    }
+                    break;
+                  }
+                  case 'bottom': {
+                    if (msg.mode === '=') {
+                      node.y -= (node.height - nodeHeight);
+                    } else {
+                      msg.mode === '-' ? node.y += value : node.y -= value;
+                    }
+                    break;
+                  }
+                }
               }
             }
           }
@@ -380,6 +438,7 @@ figma.ui.onmessage = msg => {
     case 'loadSettings': {
       let settings = loadSettings()
         .then(settings => {
+          settings.default = settingsDefault;
           figma.ui.postMessage({
             type: 'applyToHTMLSettings',
             settings: settings

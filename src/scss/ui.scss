@@ -98,17 +98,31 @@ $width: 100 90 80 70 50 40 30 25 10;
   }
 }
 
-.tube-value {
-  width: 120px;
-}
+// .tube-value {
+//   width: 100%;
+// }
 
 #tube {
+  padding-top: 1px;
+
   .button-icon {
     margin: 0 2px;
     @include wh(28px);
 
     svg {
       @include wh(85%);
+      path {
+        fill: none;
+      }
+    }
+  }
+  .mdc-input__label--right {
+    padding-right: 0;
+  }
+  .radio-custom--checked {
+    svg path {
+      stroke-width: 4px;
+      stroke: $color-success;
     }
   }
 }
