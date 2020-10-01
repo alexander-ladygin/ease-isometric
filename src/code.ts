@@ -1,12 +1,10 @@
+import { hexToRGB } from "./helpers/color";
+
 figma.showUI(__html__);
-figma.ui.resize(190, 225);
+figma.ui.resize(200, 235);
 
 const settingsDefault = {
   moveValue: 10
-};
-
-const pluginData = {
-  objects: 'ease-isometric-objects'
 };
 
 const wVal = 1.22465;
@@ -21,22 +19,19 @@ const defaultColor = {
   }
 };
 const objectsData = {
+  pluginData: {
+    key: 'ease-isometric-objects'
+  },
   tube: {
     min: 30,
-    extra: -40,
-    data: `M 101 32.5615 C 101 24.1211 97.5142 15.7759 86.5129 9.45271 C 66.9045 -1.81757 35.1128 -1.81757 15.5044 9.45271 C 4.55085 15.7484 1.00004 24.6211 1.00004 32.4538 L 1 69.4921 C 1 78.1211 4.51823 86.2378 15.4957 92.5473 C 35.1043 103.818 66.8958 103.818 86.5044 92.5473 C 97.482 86.2377 101 78.1211 101 69.4915 Z`,
-    pos: [
-      26,
-      29,
-      31,
-      33,
-      36,
-      38,
-      40,
-      43,
-      45,
-      47
-    ]
+    w: 100,
+    h: 100,
+    extra: 200,
+    data: `M 0 69.99999237060547 C 0 77.67766571044922 4.88153076171875 85.35533905029297 14.6446533203125 91.21318817138672 C 34.170867919921875 102.92891693115234 65.82913208007812 102.92891693115234 85.3553466796875 91.21318817138672 C 95.11846923828125 85.35533905029297 100 77.67766571044922 100 69.99999237060547 L 100 29.99999237060547 C 100 22.32231903076172 95.11846923828125 14.644660949707031 85.3553466796875 8.786796569824219 C 65.82913208007812 -2.9289321899414062 34.170867919921875 -2.9289321899414062 14.6446533203125 8.786796569824219 C 4.88153076171875 14.644660949707031 0 22.32231903076172 0 29.99999237060547 L 0 69.99999237060547 Z`,
+    pos: [ 2, 5, 7, 9, 12, 14, 16, 19, 21, 23, 50 ],
+    pluginData: {
+      name: 'tube-node'
+    },
   }
 };
 
@@ -130,7 +125,34 @@ function isometricLeft (node) {
   group.parent.insertChild(idx, node);
 }
 
-function insertTo (nodes, placementNode, placementPosition) {
+function inLayersBringTo (node, position = 'up') {
+  let parent = node.parent,
+    max = parent.children.length,
+    idx = parent.children.indexOf(node);
+
+  switch (position.toLowerCase()) {
+    case 'up': {
+      if (idx + 2 <= max) parent.insertChild(idx + 2, node);
+      break;
+    }
+    case 'down': {
+      if (idx - 1 >= 0) parent.insertChild(idx - 1, node);
+      break;
+    }
+    case 'start': {
+      parent.insertChild(max, node);
+      break;
+    }
+    case 'end': {
+      parent.insertChild(0, node);
+      break;
+    }
+  }
+
+  return node;
+}
+
+function inLayersInsertTo (nodes, placementNode, placementPosition) {
   placementPosition = (placementPosition || 'before').toLowerCase();
 
   let parent = placementNode.parent,
@@ -160,21 +182,20 @@ function insertTo (nodes, placementNode, placementPosition) {
 }
 
 function toBool (nodes, operationType, placementNode = null, placementPosition = 'before') {
-  if (!nodes.length) return;
+  let boolnode = figma.createBooleanOperation();
 
-  console.log(typeof operationType);
-
-  const boolop = figma.createBooleanOperation();
-  boolop.booleanOperation = operationType;
-  placementNode = placementNode || nodes[0];
-  insertTo([boolop], placementNode, placementPosition);
-  let idx = placementNode.parent.children.indexOf(placementNode);
-
-  for (const node of nodes) {
-    boolop.appendChild(node);
+  if (nodes.length) {
+    placementNode = placementNode || nodes[0];
+    inLayersInsertTo([boolnode], placementNode, placementPosition);
+  
+    for (let node of nodes) {
+      boolnode.appendChild(node);
+    }
   }
 
-  return boolop;
+  boolnode.booleanOperation = operationType;
+
+  return boolnode;
 }
 
 function moveToCenterScreen (node) {
@@ -269,27 +290,24 @@ figma.ui.onmessage = msg => {
     case 'object-tube': {
       let tube = figma.createVector(),
         tubeWidth = 100,
-        dataArr = objectsData.tube.data.split(' ');
+        oData = objectsData.tube,
+        dataArr = oData.data.split(' ');
 
       if (dataArr.length > 47) {
-        for (let index of objectsData.tube.pos) {
-          dataArr[index] = '' + (+dataArr[index] + objectsData.tube.extra);
+        for (let index of oData.pos) {
+          dataArr[index] = '' + (+dataArr[index] + oData.extra);
         }
       }
 
       tube.vectorPaths = [{
-        windingRule: 'NONZERO',
-        data: dataArr.join(' '),
+        windingRule: 'EVENODD',
+        data: dataArr.join(' ')
       }];
 
       tube.fills = [{
         type: 'SOLID',
         opacity: 1,
-        color: {
-          r: 0,
-          g: 0,
-          b: 0
-        }
+        color: hexToRGB('#000')
       }];
       moveToCenterScreen(tube);
 
@@ -299,21 +317,63 @@ figma.ui.onmessage = msg => {
       circle.fills = [{
         type: 'SOLID',
         opacity: 1,
-        color: {
-          r: 0,
-          g: 0,
-          b: 0
-        }
+        color: hexToRGB('#fff')
       }];
       circle.resizeWithoutConstraints(circleSize, circleSize);
       circle.x = tube.x + (tubeWidth - circleSize) / 2;
       circle.y = tube.y - 1;
       isometricTop(circle);
 
-      let boolop = toBool([tube, circle], 'SUBTRACT');
-      if (boolop) boolop.setPluginData(pluginData.objects, 'tube');
+      let boolop = figma.subtract([circle], tube.parent);
+      inLayersInsertTo([boolop], tube, 'before');
+      boolop.appendChild(tube);
+      inLayersBringTo(circle, 'start');
+
+      boolop.setPluginData(objectsData.pluginData.key, oData.pluginData.name);
+      figma.currentPage.selection = [boolop];
+
+      break;
     }
     case 'object-tube-change': {
+      for (let node of figma.currentPage.selection) {
+        if (node.getPluginData(objectsData.pluginData.key) === objectsData.tube.pluginData.name) {
+          if (node.type === 'BOOLEAN_OPERATION') {
+            if (node.children[0].type === 'VECTOR') {
+              let vector = node.children[0],
+              path = vector.vectorPaths[0],
+              data = path.data,
+              dataArr = data.split(' ');
+        
+              if (dataArr.length > 47) {
+                let value = +msg.value, arr_val;
+
+                for (let index of objectsData.tube.pos) {
+                  switch (msg.mode) {
+                    case '+': {
+                      dataArr[index] = '' + (+dataArr[index] + value);
+                      break;
+                    }
+                    case '-': {
+                      dataArr[index] = '' + (+dataArr[index] - value);
+                      break;
+                    }
+                    case '=': {
+                      arr_val = objectsData.tube.extra + +(dataArr[index]) - +(objectsData.tube.data.split(' ')[index]) - objectsData.tube.h;
+                      dataArr[index] = '' + (+dataArr[index] + (value - arr_val));
+                      break;
+                    }
+                  }
+                }
+
+                vector.vectorPaths = [{
+                  windingRule: 'EVENODD',
+                  data: dataArr.join(' '),
+                }];
+              }
+            }
+          }
+        }
+      }
 
       break;
     }
@@ -343,27 +403,29 @@ figma.ui.onmessage = msg => {
 };
 
 figma.on('selectionchange', () => {
+  if (figma.currentPage.selection.length > 30) return;
+
+  let shapeSectionNames = [];
+
   for (let node of figma.currentPage.selection) {
-    if (node.getPluginData(pluginData.objects) === 'tube') {
+    if (node.getPluginData(objectsData.pluginData.key) === objectsData.tube.pluginData.name) {
       if (node.type === 'BOOLEAN_OPERATION') {
-        if (node.children[0].type === 'VECTOR') {          
+        if (node.children[0].type === 'VECTOR') {
           let vector = node.children[0],
             path = vector.vectorPaths[0],
             data = path.data,
             dataArr = data.split(' ');
 
           if (dataArr.length > 47) {
-            for (let index of objectsData.tube.pos) {
-              dataArr[index] = '' + (+dataArr[index] + 100);
-            }
-
-            // vector.vectorPaths = [{
-            //   windingRule: 'NONZERO',
-            //   data: dataArr.join(' '),
-            // }];
+            shapeSectionNames.push('tube');
           }
         }
       }
     }
   }
+
+  figma.ui.postMessage({
+    type: 'edit-shape',
+    sections: shapeSectionNames
+  });
 });

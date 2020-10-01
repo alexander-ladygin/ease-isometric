@@ -1,0 +1,58 @@
+@import '../config';
+
+.mdc-button {
+  overflow: hidden;
+  cursor: pointer;
+  display: inline-block;
+  outline: none;
+  position: relative;
+  font-size: 14px;
+  text-align: center;
+  padding: 7px 14px;
+  user-select: none;
+  transition: 0.2s ease;
+  color: $color-primary-text;
+  border-radius: $mdc-border-radius;
+  background-color: $color-primary;
+
+  &:hover {
+    background-color: Color($color-primary, 10%);
+  }
+
+  &__ripple {
+    z-index: 3;
+    opacity: 0;
+    display: block;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: scale(0.2);
+    background-color: #fff;
+    transform-origin: center;
+    @include wh(30px, top left);
+
+    @include la-animkeys(buttonRipple, 0.7s ease) {
+      0% {
+        opacity: 10.9;
+        transform: scale(0.2);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(4);
+      }
+    }
+  }
+
+  &--outline {
+    color: $color-primary;
+    border: 2px solid $color-primary;
+    background-color: transparent;
+
+    &:hover {
+      background-color: transparent;
+      border-color: Color($color-primary, 10%);
+    }
+  }
+  &--outline &__ripple {
+    background-color: $color-primary;
+  }
+}

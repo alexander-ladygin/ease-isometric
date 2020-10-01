@@ -1,5 +1,6 @@
 @import 'config';
-@import 'material-input';
+@import 'section';
+@import 'material/input';
 
 
 $button-size:            40px;
@@ -7,6 +8,9 @@ $button-gutter:          5px;
 $button-icon-size:       80%;
 
 body {
+  margin: 0;
+  padding: $body-padding;
+  box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -90,6 +94,21 @@ $width: 100 90 80 70 50 40 30 25 10;
       margin-left: 5px;
       background-color: #cecece;
       @include wh(500px, 1px, middle left 100%);
+    }
+  }
+}
+
+.tube-value {
+  width: 120px;
+}
+
+#tube {
+  .button-icon {
+    margin: 0 2px;
+    @include wh(28px);
+
+    svg {
+      @include wh(85%);
     }
   }
 }

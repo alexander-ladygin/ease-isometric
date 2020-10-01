@@ -1,4 +1,5 @@
 import './scss/ui.scss'
+import { sectionOpen, sectionClose, sectionOptions, sectionEditAllClose } from './ui_js/sections'
 
 // user settings
 parent.postMessage({ pluginMessage: {
@@ -6,8 +7,24 @@ parent.postMessage({ pluginMessage: {
 } }, '*');
 
 window.onmessage = async (event) => {
-  if (event.data.pluginMessage.type === 'applyToHTMLSettings') {
-    applyToHTMLSettings(event.data.pluginMessage.settings);
+  switch (event.data.pluginMessage.type) {
+    case 'applyToHTMLSettings': {
+      applyToHTMLSettings(event.data.pluginMessage.settings);
+
+      break;
+    }
+    case 'edit-shape': {
+      sectionEditAllClose();
+
+      if (event.data.pluginMessage.sections instanceof Array && event.data.pluginMessage.sections.length) {
+        sectionOpen('edit-shape');
+        event.data.pluginMessage.sections.forEach((section) => {
+          sectionOpen(section, sectionOptions.stateClass.edit);
+        });
+      }
+
+      break;
+    }
   }
 };
 
@@ -117,4 +134,31 @@ document.getElementById('move-bottom-right').addEventListener('mousewheel', move
 
 document.getElementById('object-tube').addEventListener('click', function (e) {
   parent.postMessage({ pluginMessage: { type: this.id } }, '*');
+  sectionOpen('edit-shape');
+});
+
+function objectTubeGetProps (mode) {
+  return {
+    mode: mode,
+    type: 'object-tube-change',
+    value: +document.getElementById('tube-value').value,
+  }
+}
+
+document.getElementById('tube-change-plus').addEventListener('click', function (e) {
+  parent.postMessage({ pluginMessage: objectTubeGetProps('+') }, '*');
+});
+document.getElementById('tube-change-plus').addEventListener('mousewheel', function (e) {
+  let delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
+  parent.postMessage({ pluginMessage: objectTubeGetProps(delta < 1 ? '-' : '+') }, '*');
+});
+document.getElementById('tube-change-minus').addEventListener('click', function (e) {
+  parent.postMessage({ pluginMessage: objectTubeGetProps('-') }, '*');
+});
+document.getElementById('tube-change-minus').addEventListener('mousewheel', function (e) {
+  let delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
+  parent.postMessage({ pluginMessage: objectTubeGetProps(delta < 1 ? '+' : '-') }, '*');
+});
+document.getElementById('tube-change-equal').addEventListener('click', function (e) {
+  parent.postMessage({ pluginMessage: objectTubeGetProps('=') }, '*');
 });

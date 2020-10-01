@@ -1,0 +1,93 @@
+@import 'config';
+
+[data-section-title]:before {
+  content: attr('data-section-title');
+  font-size: 12px;
+  color: $color-text;
+  font-weight: bold;
+  background-color: red;
+  @include wh(100px, 25px, top left);
+}
+
+.section {
+  z-index: 1;
+  display: block;
+  position: relative;
+  transition: 0.2s ease;
+
+  &-modal {
+    z-index: 3;
+    display: block;
+    overflow: auto;
+    transition: 0.3s ease;
+    padding: $body-padding;
+    padding-top: 15px;
+    will-change: transform;
+    box-sizing: border-box;
+    @include wh(100%, fixed top left 150%);
+    background-color: rgba($color-body, 0.8);
+
+    &__btn-close {
+      $size:       20px;
+      $offset-x:   5px;
+      $offset-y:   5px;
+      $weight:     2px;
+      $color:      $color-primary;
+
+      z-index: 10;
+      display: block;
+      cursor: pointer;
+      border-radius: 50%;
+      box-sizing: border-box;
+      transition: 0.2s ease;
+      border: $weight solid $color;
+      background-color: $color-body;
+      @include wh($size, top $offset-y right $offset-x);
+
+      &:before,
+      &:after {
+        content: '';
+        display: block;
+        transform-origin: center;
+        transform: rotate(45deg);
+        background-color: $color;
+        @include wh(70%, $weight, middle center);
+      }
+      &:after {
+        transform: rotate(-45deg);
+      }
+
+      &:hover {
+        transform: scale(1.1);
+      }
+      &:active {
+        transform: scale(0.9);
+      }
+    }
+    &:not(#{'&--show'}) &__btn-close {
+      transform: scale(0);
+    }
+    &--show &__btn-close {
+      transition-delay: 0.3s;
+    }
+
+    &--show {
+      transform: translateX(-150%);
+    }
+  }
+
+  &-edit {
+    z-index: 2;
+    position: relative;
+
+    &:not(#{'&--show'}) {
+      display: none;
+      @debug &;
+    }
+  }
+
+  &--back {
+    opacity: 0;
+    pointer-events: none;
+  }
+}

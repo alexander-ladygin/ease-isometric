@@ -1,7 +1,9 @@
-@import 'config';
+@import '../config';
 
-.input-group {
-  $border-radius: 4px;
+.mdc-input {
+  $input-padding:          8px;
+  $input-border:           1px solid $color-mdc-border-bottom;
+  $border-radius:          $mdc-border-radius;
 
   font-size: 90%;
   display: block;
@@ -20,13 +22,13 @@
 
   input {
     font-size: 100%;
-    padding: 10px;
     display: block;
     width: 100%;
     border: none;
+    padding: $input-padding;
     background-color: $color-body;
     border-radius: $border-radius;
-    border-bottom: 1px solid #ccc;
+    border-bottom: $input-border;
 
     &:focus {
       outline: none;
@@ -148,7 +150,7 @@
   &--focused &__label {
     top: -15px;
     font-size: 12px;
-    color: #646464;
+    color: $color-mdc-label;
   }
 
   input:focus ~ &__bar:before,
@@ -174,5 +176,11 @@
   }
   &--transparent &__label {
     background-color: transparent;
+  }
+  &--outline {
+    input {
+      border: $input-border;
+      padding: $input-padding / 1.5 $input-padding;
+    }
   }
 }

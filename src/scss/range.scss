@@ -4,9 +4,9 @@ $range-track-margin:            15px 0;
 $range-track-color:             #d3d3d3;
 $range-thumb-corners:           50%;
 $range-thumb-size:              15px;
-$range-thumb-color:             #1d5ed6;
-$range-thumb-color-hover:       $range-thumb-color;
-$range-thumb-color-active:      $range-thumb-color;
+$range-thumb-color:             $color-primary;
+$range-thumb-color-hover:       $color-primary;
+$range-thumb-color-active:      $color-primary;
 
 .range-group {
   display: flex;
