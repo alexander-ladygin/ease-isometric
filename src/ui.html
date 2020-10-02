@@ -1,6 +1,6 @@
 <div id="app">
   <section id="buttons" data-link-section="edit-shape" class="section">
-    <div class="buttons-wrapper">
+    <div id="isometric-transform" class="buttons-wrapper">
       <div id="isometric-top" class="button-icon">
         <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0)"><path d="M44.146 35.422V13.578a.682.682 0 00-.35-.568L24.88 2.087a.595.595 0 00-.656 0L5.306 13.01c-.175.13-.306.35-.306.568v21.844c0 .175.087.35.175.48.043.045.087.088.13.088l18.918 10.923a.823.823 0 00.35.087c.13 0 .218-.044.35-.087L43.84 35.99c.043-.043.087-.043.13-.087.088-.131.176-.306.176-.48zm-1.311-20.708v19.572L25.884 24.5l16.951-9.786zM6.966 35.422l16.951-9.786v19.573L6.966 35.422zm18.262 9.787V25.636l16.952 9.786-16.952 9.787zM23.262 24.5L6.311 34.286V14.714L23.262 24.5z" fill="#050512"/></g><defs><clipPath id="clip0"><path fill="#fff" transform="translate(5 2)" d="M0 0h39.146v45H0z"/></clipPath></defs></svg>
       </div>
@@ -15,7 +15,7 @@
       </div>
     </div>
   
-    <div class="buttons-wrapper">
+    <div id="isometric-move" class="buttons-wrapper">
       <div id="move-top-right" class="button-icon">
         <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.578 42.715h.002l17.319-9.999 4.46 2.575c.003.003.009.002.013.004l.033.015.013.007a.281.281 0 00.213-.022c.01-.004.017-.01.026-.016a.288.288 0 00.078-.077c.005-.007.013-.01.017-.017.002-.005.002-.01.005-.016a.232.232 0 00.014-.035c.001-.004.005-.005.006-.008l4.074-13.304c.004-.014.002-.028.004-.043.002-.014.009-.027.009-.041v-9.294c0-.005-.003-.01-.003-.014-.001-.005.002-.01.001-.015-.002-.016-.01-.03-.014-.045-.004-.017-.008-.034-.014-.05l-.007-.014-.002-.002c-.006-.011-.016-.019-.023-.029-.01-.015-.02-.03-.033-.042-.013-.012-.029-.02-.044-.029a.257.257 0 00-.053-.029c-.004-.001-.008-.005-.012-.007-.014-.004-.029-.002-.043-.003-.014-.003-.027-.009-.041-.009-.005 0-.01.002-.014.003l-.017-.002-23.042 2.352c-.008.001-.014.005-.021.006a.264.264 0 00-.075.024l-.029.017a.307.307 0 00-.058.048c-.009.01-.015.02-.022.03-.004.006-.011.01-.015.018-.003.005-.003.01-.006.016-.005.01-.009.019-.012.03-.005.012-.008.025-.01.038-.003.014-.006.028-.007.043 0 .006-.004.01-.004.017v5.149L7.53 27.286c-.006.003-.009.008-.013.012a.426.426 0 00-.059.051.188.188 0 00-.022.03c-.004.005-.009.008-.012.013-.003.005-.002.011-.005.017a.262.262 0 00-.025.073.316.316 0 00-.005.038c0 .006-.003.01-.003.017v9.293c0 .012.005.022.007.034.003.02.005.04.012.059.006.017.015.032.024.048.01.016.018.032.03.046.013.014.029.026.045.039.01.007.016.017.027.023l9.762 5.636h.001c.005.003.01.002.014.005.039.02.081.034.128.034s.09-.014.129-.034c.005-.002.01-.002.013-.005zm7.7-25.01l.003-.002a.281.281 0 00.095-.095c.002-.004.008-.006.01-.01.006-.01.007-.022.011-.034a.255.255 0 00.019-.055.286.286 0 00.004-.055c0-.018 0-.036-.004-.054a.247.247 0 00-.019-.056c-.005-.011-.005-.023-.011-.034-.003-.005-.008-.008-.011-.012-.011-.017-.025-.03-.039-.044-.013-.014-.026-.027-.041-.037-.006-.003-.009-.009-.014-.012l-3.831-2.212 21.725-2.218-3.841 12.543-4.291-2.477c-.005-.003-.011-.003-.017-.006a.327.327 0 00-.074-.024.307.307 0 00-.037-.006c-.005 0-.01-.003-.016-.003-.005 0-.01.003-.016.003a.355.355 0 00-.078.016.325.325 0 00-.033.014c-.006.003-.012.002-.017.005l-17.319 10-9.186-5.304 17.029-9.832z" fill="#050512"/></svg>
       </div>
@@ -34,7 +34,11 @@
       <p class="section-title">
         <span>Isometric objects:</span>
       </p>
+
       <div class="buttons-wrapper">
+        <div id="object-cubic" class="button-icon">
+          <svg width="50" height="50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 50 50"><defs/><g stroke="#000" stroke-dasharray="4 4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" opacity="0.5"><path d="M45.733 37.302L25.367 25.5V2M5 37.302L25.367 25.5"/></g><path stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M45.733 13.802L25.367 25.5 5 13.802"/><path stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M45.733 37.302L25.367 49 5 37.302v-23.5L25.367 2l20.366 11.802v23.5zM25.367 25.5V49"/></svg>
+        </div>
         <div id="object-tube" class="button-icon">
           <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M2 34.5c0 3.455 2.197 6.91 6.59 9.546 8.787 5.272 23.033 5.272 31.82 0C44.803 41.41 47 37.955 47 34.5v-18c0-3.455-2.197-6.91-6.59-9.546-8.787-5.272-23.033-5.272-31.82 0C4.197 9.59 2 13.045 2 16.5v18zm31.087-23.412c4.743 2.738 4.743 7.177 0 9.915-4.742 2.738-12.432 2.738-17.174 0-4.743-2.738-4.743-7.177 0-9.915 4.742-2.737 12.432-2.737 17.174 0zm3.922-2.264c6.909 3.989 6.909 10.455 0 14.443-6.908 3.989-18.11 3.989-25.018 0-6.909-3.988-6.909-10.454 0-14.443 6.909-3.988 18.11-3.988 25.018 0zm1.732-1c7.865 4.541 7.865 11.903 0 16.444-7.865 4.54-20.617 4.54-28.482 0-7.865-4.541-7.865-11.903 0-16.444 7.865-4.54 20.617-4.54 28.482 0z" fill="#34343E"/></svg>
         </div>
@@ -50,6 +54,42 @@
 
   <section id="edit-shape" data-link-section="buttons" class="section section-modal">
     <div class="section-modal__btn-close"></div>
+
+    <div id="cubic" data-section-title="Cubic" class="section-edit">
+      <div class="flex-group">  
+        <div class="mdc-input cubic-value w-100">
+          <input type="number" required id="cubic-value" data-min="0" value="10">
+          <span class="mdc-input__bar"></span>
+          <label class="mdc-input__label">Value:</label>
+        </div>
+        <div class="cubic-change-buttons">
+          <div class="flex-group">
+            <div id="cubic-change-left" class="button-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="none" viewBox="0 0 50 50"><defs/><path fill="none" d="M0 0h50v50H0z"/><rect width="20" height="20" fill="#34343E" rx="2" transform="matrix(-1 0 0 1 45 25)"/><path stroke="#34343E" stroke-dasharray="4 4" stroke-linecap="round" stroke-linejoin="round" d="M35 5H5v30h30z"/><path stroke="#34343E" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M39.818 39.93L15.069 15.183m0 0l7.307.943m-7.307-.943l.943 7.307"/></svg>
+            </div>
+            <div id="cubic-change-right" class="button-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="none" viewBox="0 0 50 50"><defs/><path fill="none" d="M0 0h50v50H0z"/><rect width="20" height="20" x="5" y="25" fill="#34343E" rx="2"/><path stroke="#34343E" stroke-dasharray="4 4" stroke-linecap="round" stroke-linejoin="round" d="M15 5h30v30H15z"/><path stroke="#34343E" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.182 39.93l24.749-24.748m0 0l-7.307.943m7.307-.943l-.943 7.307"/></svg>
+            </div>
+            <div id="cubic-change-bottom" class="button-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="none" viewBox="0 0 50 50"><defs/><path fill="none" d="M0 0h50v50H0z"/><rect width="20" height="20" fill="#34343E" rx="2" transform="matrix(-1 0 0 1 35 5)"/><path stroke="#34343E" stroke-dasharray="4 4" stroke-linecap="round" stroke-linejoin="round" d="M40 15H10v30h30z"/><path stroke="#34343E" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M24.5 16v24m0 0L20 34.167M24.5 40l4.5-5.833"/></svg>
+            </div>
+          </div>
+          <div class="flex-group">
+            <div id="cubic-anchor-bottom" class="cubic-anchor button-icon radio-custom">
+              <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 1H10a9 9 0 00-9 9v30a9 9 0 009 9h30a9 9 0 009-9V10a9 9 0 00-9-9z" stroke="#000" stroke-width="2"/><path d="M25 40V10m0 30l9-9m-9 9l-9-9" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div id="cubic-anchor-center" class="cubic-anchor button-icon radio-custom">
+              <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 1H10a9 9 0 00-9 9v30a9 9 0 009 9h30a9 9 0 009-9V10a9 9 0 00-9-9z" stroke="#000" stroke-width="2"/><path d="M25 40V10m0 30l9-9m-9 9l-9-9m9-21l9 9m-9-9l-9 9" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div id="cubic-anchor-top" class="cubic-anchor button-icon radio-custom radio-custom--checked">
+              <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 1H10a9 9 0 00-9 9v30a9 9 0 009 9h30a9 9 0 009-9V10a9 9 0 00-9-9z" stroke="#000" stroke-width="2"/><path d="M25 40V10m0 0l9 9m-9-9l-9 9" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="section__note">Mouse button, LEFT: " <b>+</b> ", RIGHT: " <b>-</b> "<br>mouse wheel supported</p>
+    </div>
+
     <div id="tube" data-section-title="Tube" class="section-edit">
       <div class="mdc-input tube-value w-100">
         <input type="number" required id="tube-value" data-min="0" value="10">
@@ -67,15 +107,21 @@
           <svg width="50" height="50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 50 50"><defs/><rect width="48" height="48" x="1" y="1" stroke="#000" stroke-width="2" rx="9"/><path stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 30h30M10 20h30"/></svg>
         </div>
         <div id="tube-anchor-top" class="tube-anchor button-icon radio-custom radio-custom--checked">
-          <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 1H10a9 9 0 00-9 9v30a9 9 0 009 9h30a9 9 0 009-9V10a9 9 0 00-9-9z" stroke="#000" stroke-width="2"/><path d="M25 40V10m0 0l9 9m-9-9l-9 9" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 1H10a9 9 0 00-9 9v30a9 9 0 009 9h30a9 9 0 009-9V10a9 9 0 00-9-9z" stroke="#000" stroke-width="2"/><path d="M25 40V10m0 30l9-9m-9 9l-9-9" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div id="tube-anchor-center" class="tube-anchor button-icon radio-custom">
           <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 1H10a9 9 0 00-9 9v30a9 9 0 009 9h30a9 9 0 009-9V10a9 9 0 00-9-9z" stroke="#000" stroke-width="2"/><path d="M25 40V10m0 30l9-9m-9 9l-9-9m9-21l9 9m-9-9l-9 9" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div id="tube-anchor-bottom" class="tube-anchor button-icon radio-custom">
-          <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 1H10a9 9 0 00-9 9v30a9 9 0 009 9h30a9 9 0 009-9V10a9 9 0 00-9-9z" stroke="#000" stroke-width="2"/><path d="M25 40V10m0 30l9-9m-9 9l-9-9" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 1H10a9 9 0 00-9 9v30a9 9 0 009 9h30a9 9 0 009-9V10a9 9 0 00-9-9z" stroke="#000" stroke-width="2"/><path d="M25 40V10m0 0l9 9m-9-9l-9 9" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
       </div>
+      <p class="section__note">" + ", " - ", " = ", mouse wheel supported</p>
     </div>
+
   </section>
+
+  <div id="open-edit-shape">
+    <span>Edit shape</span>
+  </div>
 </div>

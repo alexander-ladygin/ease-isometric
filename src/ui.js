@@ -22,6 +22,9 @@ window.onmessage = async (event) => {
         event.data.pluginMessage.sections.forEach((section) => {
           sectionOpen(section, sectionOptions.stateClass.edit);
         });
+        if (event.data.pluginMessage.sections.length) {
+          document.getElementById('open-edit-shape').classList.add('show');
+        }
       }
 
       break;
@@ -38,15 +41,25 @@ function saveSettings() {
         value: +document.getElementById('tube-value').value || 0,
         anchor: document.querySelector('.tube-anchor.radio-custom--checked').getAttribute('id') || 'tube-anchor-top',
       },
+      cubic: {
+        value: +document.getElementById('cubic-value').value || 0,
+        anchor: document.querySelector('.cubic-anchor.radio-custom--checked').getAttribute('id') || 'cubic-anchor-top',
+      }
     }
   } }, '*');
 }
 
 function applyToHTMLSettings (data) {
-  data.tube = data.tube || data.default.tube;
   document.getElementById('move-value').value = data.moveValue;
+
+  data.tube = data.tube || data.default.tube;
   document.getElementById('tube-value').value = data.tube.value;
   radioCustomSwitch(document.getElementById(data.tube.anchor));
+  
+
+  data.cubic = data.cubic || data.default.cubic;
+  document.getElementById('cubic-value').value = data.cubic.value;
+  radioCustomSwitch(document.getElementById(data.cubic.anchor));
 }
 
 function inputNumberRound (e) {
@@ -110,10 +123,6 @@ document.getElementById('isometric-left').addEventListener('click', function (e)
 });
 
 // move
-function moveGetValue() {
-  return +document.getElementById('move-value').value;
-}
-
 document.getElementById('move-value').addEventListener('change', function (e) {
   saveSettings();
 });
@@ -121,7 +130,7 @@ document.getElementById('move-value').addEventListener('keydown', inputNumberRou
 document.getElementById('move-value').addEventListener('mousewheel', inputNumberRound);
 
 function moveClickHandler (e) {
-  parent.postMessage({ pluginMessage: { type: this.id, value: moveGetValue() } }, '*');
+  parent.postMessage({ pluginMessage: { type: this.id, value: +document.getElementById('move-value').value } }, '*');
 }
 function moveMouseWheelHandler (e) {
   let delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
@@ -130,7 +139,7 @@ function moveMouseWheelHandler (e) {
       this.id === 'move-bottom-left' ? 'move-top-right' : 'move-top-left'
     )
   );
-  parent.postMessage({ pluginMessage: { type: delta > 0 ? this.id : reType, value: moveGetValue() } }, '*');
+  parent.postMessage({ pluginMessage: { type: delta > 0 ? this.id : reType, value: +document.getElementById('move-value').value } }, '*');
 }
 
 document.getElementById('move-top-right').addEventListener('click', moveClickHandler);
@@ -145,6 +154,30 @@ document.getElementById('move-bottom-left').addEventListener('mousewheel', moveM
 document.getElementById('move-bottom-right').addEventListener('click', moveClickHandler);
 document.getElementById('move-bottom-right').addEventListener('mousewheel', moveMouseWheelHandler);
 
+// edit object
+document.getElementById('open-edit-shape').addEventListener('click', e => {
+  sectionOpen('edit-shape');
+});
+
+let mouseWheelElements = [
+  'cubic-change-left',
+  'cubic-change-right',
+  'cubic-change-bottom',
+  'tube-change-plus',
+  'tube-change-minus',
+  'tube-change-equal'
+], mouseWheelElementsLength = mouseWheelElements.length;
+document.getElementById('edit-shape').addEventListener('mousewheel', function (e) {
+  for (let i = 0; i < mouseWheelElementsLength; i++) {
+    if ((e.target.classList && e.target.id === mouseWheelElements[i]) || (e.target.closest(`#${mouseWheelElements[i]}`))) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }
+});
+
+// object tube
 document.getElementById('object-tube').addEventListener('click', function (e) {
   parent.postMessage({ pluginMessage: { type: this.id } }, '*');
   sectionOpen('edit-shape');
@@ -183,4 +216,62 @@ document.getElementById('tube-change-minus').addEventListener('mousewheel', func
 });
 document.getElementById('tube-change-equal').addEventListener('click', function (e) {
   parent.postMessage({ pluginMessage: objectTubeGetProps('=') }, '*');
+});
+
+
+// object cubic
+function objectCubicGetProps (direction, mode) {
+  saveSettings();
+
+  return {
+    mode: mode,
+    direction: direction,
+    type: 'object-cubic-change',
+    anchor: document.querySelector('.cubic-anchor.radio-custom--checked').getAttribute('id'),
+    value: +document.getElementById('cubic-value').value,
+  }
+}
+
+document.getElementById('object-cubic').addEventListener('click', function (e) {
+  parent.postMessage({ pluginMessage: { type: this.id } }, '*');
+  sectionOpen('edit-shape');
+});
+document.getElementById('cubic-value').addEventListener('change', function (e) {
+  saveSettings();
+});
+
+// left
+document.getElementById('cubic-change-left').addEventListener('click', function (e) {
+  parent.postMessage({ pluginMessage: objectCubicGetProps(this.id.replace('cubic-change-', ''), '+') }, '*');
+});
+document.getElementById('cubic-change-left').addEventListener('mouseup', function (e) {
+  if (e.which === 3) parent.postMessage({ pluginMessage: objectCubicGetProps(this.id.replace('cubic-change-', ''), '-') }, '*');
+});
+document.getElementById('cubic-change-left').addEventListener('mousewheel', function (e) {
+  let delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
+  parent.postMessage({ pluginMessage: objectCubicGetProps(this.id.replace('cubic-change-', ''), delta < 1 ? '-' : '+') }, '*');
+});
+
+// right
+document.getElementById('cubic-change-right').addEventListener('click', function (e) {
+  parent.postMessage({ pluginMessage: objectCubicGetProps(this.id.replace('cubic-change-', ''), '+') }, '*');
+});
+document.getElementById('cubic-change-right').addEventListener('mouseup', function (e) {
+  if (e.which === 3) parent.postMessage({ pluginMessage: objectCubicGetProps(this.id.replace('cubic-change-', ''), '-') }, '*');
+});
+document.getElementById('cubic-change-right').addEventListener('mousewheel', function (e) {
+  let delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
+  parent.postMessage({ pluginMessage: objectCubicGetProps(this.id.replace('cubic-change-', ''), delta < 1 ? '-' : '+') }, '*');
+});
+
+// top
+document.getElementById('cubic-change-bottom').addEventListener('click', function (e) {
+  parent.postMessage({ pluginMessage: objectCubicGetProps(this.id.replace('cubic-change-', ''), '+') }, '*');
+});
+document.getElementById('cubic-change-bottom').addEventListener('mouseup', function (e) {
+  if (e.which === 3) parent.postMessage({ pluginMessage: objectCubicGetProps(this.id.replace('cubic-change-', ''), '-') }, '*');
+});
+document.getElementById('cubic-change-bottom').addEventListener('mousewheel', function (e) {
+  let delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
+  parent.postMessage({ pluginMessage: objectCubicGetProps(this.id.replace('cubic-change-', ''), delta < 1 ? '-' : '+') }, '*');
 });

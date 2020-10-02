@@ -1,4 +1,4 @@
-import { hexToRGB } from "./helpers/color";
+import { hexToRGB, webRGBToRGB } from "./helpers/color";
 
 figma.showUI(__html__);
 figma.ui.resize(200, 235);
@@ -8,6 +8,10 @@ const settingsDefault = {
   tube: {
     value: 10,
     anchor: 'tube-anchor-top',
+  },
+  cubic: {
+    value: 10,
+    anchor: 'cubic-anchor-top',
   }
 };
 
@@ -23,10 +27,13 @@ const defaultColor = {
   }
 };
 const objectsData = {
+  // default
   pluginData: {
     key: 'ease-isometric-objects'
   },
   appendToFrame: false,
+  
+  //objects
   tube: {
     min: 30,
     w: 100,
@@ -36,6 +43,17 @@ const objectsData = {
     pos: [ 2, 5, 7, 9, 12, 14, 16, 19, 21, 23, 50 ],
     pluginData: {
       name: 'tube-node'
+    },
+  },
+
+  cubic: {
+    names: {
+      group: 'isometric-cubic',
+      prefixSides: 'side-'
+    },
+    pluginData: {
+      name: 'cubic-node',
+      side: 'cubic-side'
     },
   }
 };
@@ -130,6 +148,46 @@ function isometricLeft (node) {
   group.parent.insertChild(idx, node);
 }
 
+function isometricMoveTopLeft (nodes, value) {
+  let angle = 60;
+  let val = (value * (value < 0 ? -1 : 1)) * -1;
+  
+  for (const node of nodes) {
+    node.x += val * Math.sin( mathRadians(angle % 360) );
+    node.y += val * Math.cos( mathRadians(angle % 360) );
+  }
+}
+
+function isometricMoveTopRight (nodes, value) {
+  let angle = 60;
+  let val = (value * (value < 0 ? -1 : 1));
+  
+  for (const node of nodes) {
+    node.x += val * Math.sin( mathRadians(angle % 360) );
+    node.y -= val * Math.cos( mathRadians(angle % 360) );
+  }
+}
+
+function isometricMoveBottomRight (nodes, value) {
+  let angle = 60;
+  let val = (value * (value < 0 ? -1 : 1));
+  
+  for (const node of nodes) {
+    node.x += val * Math.sin( mathRadians(angle % 360) );
+    node.y += val * Math.cos( mathRadians(angle % 360) );
+  }
+}
+
+function isometricMoveBottomLeft (nodes, value) {
+  let angle = 60;
+  let val = (value * (value < 0 ? -1 : 1)) * -1;
+  
+  for (const node of nodes) {
+    node.x += val * Math.sin( mathRadians(angle % 360) );
+    node.y -= val * Math.cos( mathRadians(angle % 360) );
+  }
+}
+
 function inLayersBringTo (node, position = 'up') {
   let parent = node.parent,
     max = parent.children.length,
@@ -203,6 +261,35 @@ function toBool (nodes, operationType, placementNode = null, placementPosition =
   return boolnode;
 }
 
+function toGroup (nodes, options = {}) {
+  if (nodes && nodes.length) {
+    let group = figma.group(nodes, nodes[0].parent);
+    
+    for (let prop in options) {
+      group[prop] = options[prop];
+    }
+
+    return group;
+  }
+
+  return null;
+}
+
+function ungroup (group) {
+  let parent = group.parent,
+    idx = parent.children.indexOf(group),
+    childs = group.children,
+    i = childs.length,
+    arr = [];
+
+  if (i) while (i--) {
+    parent.insertChild(idx, childs[i]);
+    arr.push(childs[i]);
+  }
+
+  return arr;
+}
+
 function moveToCenterScreen (node) {
   node.x = figma.viewport.center.x - node.width / 2;
   node.y = figma.viewport.center.y - node.height / 2;
@@ -232,70 +319,83 @@ async function saveSettings (data) {
 
 figma.ui.onmessage = msg => {
   switch (msg.type) {
+    // transform
     case 'isometric-top': {
+      if (!figma.currentPage.selection.length) {
+        return figma.notify('Please select one or more objects!');
+      }
+
       for (const node of figma.currentPage.selection) {
         isometricTop(node);
       }
       break;
     }
     case 'isometric-bottom': {
+      if (!figma.currentPage.selection.length) {
+        return figma.notify('Please select one or more objects!');
+      }
+
       for (const node of figma.currentPage.selection) {
         isometricBottom(node);
       }
       break;
     }
     case 'isometric-right': {
+      if (!figma.currentPage.selection.length) {
+        return figma.notify('Please select one or more objects!');
+      }
+
       for (const node of figma.currentPage.selection) {
         isometricRight(node);
       }
       break;
     }
     case 'isometric-left': {
+      if (!figma.currentPage.selection.length) {
+        return figma.notify('Please select one or more objects!');
+      }
+
       for (const node of figma.currentPage.selection) {
         isometricLeft(node);
       }
       break;
     }
-    case 'move-top-left': {
-      let angle = 60;
-      let val = +msg.value * -1;
 
-      for (const node of figma.currentPage.selection) {
-        node.x += val * Math.sin( mathRadians(angle % 360) );
-        node.y += val * Math.cos( mathRadians(angle % 360) );
+    // move
+    case 'move-top-left': {
+      if (!figma.currentPage.selection.length) {
+        return figma.notify('Please select one or more objects!');
       }
+
+      isometricMoveTopLeft(figma.currentPage.selection, +msg.value);
       break;
     }
     case 'move-top-right': {
-      let angle = 60;
-      let val = +msg.value;
-
-      for (const node of figma.currentPage.selection) {
-        node.x += val * Math.sin( mathRadians(angle % 360) );
-        node.y -= val * Math.cos( mathRadians(angle % 360) );
+      if (!figma.currentPage.selection.length) {
+        return figma.notify('Please select one or more objects!');
       }
+
+      isometricMoveTopRight(figma.currentPage.selection, +msg.value);
       break;
     }
     case 'move-bottom-right': {
-      let angle = 60;
-      let val = +msg.value;
-
-      for (const node of figma.currentPage.selection) {
-        node.x += val * Math.sin( mathRadians(angle % 360) );
-        node.y += val * Math.cos( mathRadians(angle % 360) );
+      if (!figma.currentPage.selection.length) {
+        return figma.notify('Please select one or more objects!');
       }
+
+      isometricMoveBottomRight(figma.currentPage.selection, +msg.value);
       break;
     }
     case 'move-bottom-left': {
-      let angle = 60;
-      let val = +msg.value * -1;
-
-      for (const node of figma.currentPage.selection) {
-        node.x += val * Math.sin( mathRadians(angle % 360) );
-        node.y -= val * Math.cos( mathRadians(angle % 360) );
+      if (!figma.currentPage.selection.length) {
+        return figma.notify('Please select one or more objects!');
       }
+
+      isometricMoveBottomLeft(figma.currentPage.selection, +msg.value);
       break;
     }
+
+    // tube object
     case 'object-tube': {
       let frameInSelection;
       if (objectsData.appendToFrame && figma.currentPage.selection) {
@@ -435,7 +535,217 @@ figma.ui.onmessage = msg => {
 
       break;
     }
+
+    // cubic object
+    case 'object-cubic': {
+      let oData = objectsData.cubic,
+        size = 50,
+        sides = {
+          top: figma.createRectangle(),
+          right: figma.createRectangle(),
+          bottom: figma.createRectangle(),
+          left: figma.createRectangle(),
+        };
+
+      let colorValue = 100,
+        step = 15,
+        counter = 1;
+
+      for (let prop in sides) {
+        sides[prop].name = objectsData.cubic.names.prefixSides + prop;
+        sides[prop].resizeWithoutConstraints(size, size);
+        sides[prop].fills = [{
+          type: 'SOLID',
+          opacity: 1,
+          color: webRGBToRGB([colorValue + step * counter, colorValue + step * counter, colorValue + step * counter])
+        }];
+        sides[prop].setPluginData(oData.pluginData.side, prop);
+        counter++;
+        moveToCenterScreen(sides[prop]);
+      }
+
+      isometricTop(sides.top);
+      isometricRight(sides.right);
+      isometricBottom(sides.bottom);
+      isometricLeft(sides.left);
+
+
+      // align side left
+      let sideLeftGroup = toGroup([sides.left]),
+        sidesLeftWidth = sideLeftGroup.width,
+        sidesLeftHeight = sideLeftGroup.height;
+
+      sideLeftGroup.x -= sideLeftGroup.width;
+      ungroup(sideLeftGroup);
+
+
+      // align side bottom
+      let sideBottomGroup = toGroup([sides.bottom]);
+
+      sideBottomGroup.x = sides.left.x + sidesLeftWidth - sideBottomGroup.width / 2;
+      sideBottomGroup.y = sides.left.y + sidesLeftHeight - sideBottomGroup.height;
+
+      let sidesBottomProps = {
+          x: sideBottomGroup.x,
+          y: sideBottomGroup.y,
+          w: sideBottomGroup.width,
+          h: sideBottomGroup.height,
+        };
+      ungroup(sideBottomGroup);
+
+      // align side top
+      let sideTopGroup = toGroup([sides.top]);
+
+      sideTopGroup.x = sidesBottomProps.x;
+      sideTopGroup.y = sidesBottomProps.y - sideTopGroup.height;
+      ungroup(sideTopGroup);
+
+      // group sides
+      let cubicGroup = toGroup([sides.top, sides.right, sides.bottom, sides.left], {
+        name: objectsData.cubic.names.group
+      });
+
+      inLayersBringTo(sides.bottom, 'end');
+      cubicGroup.setPluginData(objectsData.pluginData.key, oData.pluginData.name);
+      figma.currentPage.selection = [cubicGroup];
+
+      break;
+    }
+    case 'object-cubic-change': {
+      let oData = objectsData.cubic,
+        value = +msg.value * (msg.mode === '-' ? -1 : 1);
+
+      for (let node of figma.currentPage.selection) {
+        if (node.getPluginData(objectsData.pluginData.key) === objectsData.cubic.pluginData.name) {
+          switch (msg.direction) {
+            case 'left': {
+              if (node.type === 'GROUP') {
+                for (let side of node.children) {
+                  switch (side.getPluginData(oData.pluginData.side)) {
+                    case 'left': {
+                      side.resizeWithoutConstraints(side.width + value, side.height);
+                      if (msg.mode === '-') isometricMoveBottomRight([side], value);
+                        else isometricMoveTopLeft([side], value);
+                      break;
+                    }
+                    case 'top': {
+                      side.resizeWithoutConstraints(side.width, side.height + value);
+                      if (msg.mode === '-') isometricMoveBottomRight([side], value);
+                        else isometricMoveTopLeft([side], value);
+                      break;
+                    }
+                    case 'bottom': {
+                      side.resizeWithoutConstraints(side.width + value, side.height);
+                      if (msg.mode === '-') isometricMoveBottomRight([side], value);
+                        else isometricMoveTopLeft([side], value);
+                      break;
+                    }
+                  }
+                }
+
+                // align anchor
+                switch (msg.anchor.replace('cubic-anchor-', '')) {
+                  case 'bottom': {
+                    if (msg.mode === '-') isometricMoveTopLeft([node], value);
+                      else isometricMoveBottomRight([node], value);
+                    break;
+                  }
+                  case 'center': {
+                    if (msg.mode === '-') isometricMoveTopLeft([node], value / 2);
+                      else isometricMoveBottomRight([node], value / 2);
+                    break;
+                  }
+                }
+              }
+
+              break;
+            }
+            case 'right': {
+              if (node.type === 'GROUP') {
+                for (let side of node.children) {
+                  switch (side.getPluginData(oData.pluginData.side)) {
+                    case 'right': {
+                      side.resizeWithoutConstraints(side.width + value, side.height);
+                      break;
+                    }
+                    case 'top': {
+                      side.resizeWithoutConstraints(side.width + value, side.height);
+                      break;
+                    }
+                    case 'bottom': {
+                      side.resizeWithoutConstraints(side.width, side.height + value);
+                      if (msg.mode === '-') isometricMoveBottomLeft([side], value);
+                        else isometricMoveTopRight([side], value);
+                      break;
+                    }
+                  }
+                }
+              }
+
+              // align anchor
+              switch (msg.anchor.replace('cubic-anchor-', '')) {
+                case 'bottom': {
+                  if (msg.mode === '-') isometricMoveTopRight([node], value);
+                    else isometricMoveBottomLeft([node], value);
+                  break;
+                }
+                case 'center': {
+                  if (msg.mode === '-') isometricMoveTopRight([node], value / 2);
+                    else isometricMoveBottomLeft([node], value / 2);
+                  break;
+                }
+              }
+
+              break;
+            }
+            case 'bottom': {
+              if (node.type === 'GROUP') {
+                for (let side of node.children) {
+                  switch (side.getPluginData(oData.pluginData.side)) {
+                    case 'top': {
+                      break;
+                    }
+                    case 'right': {
+                      side.resizeWithoutConstraints(side.width, side.height + value);
+                      break;
+                    }
+                    case 'bottom': {
+                      side.y += value;
+                      break;
+                    }
+                    case 'left': {
+                      side.resizeWithoutConstraints(side.width, side.height + value);
+                      break;
+                    }
+                  }
+                }
+              }
+
+              // align anchor
+              switch (msg.anchor.replace('cubic-anchor-', '')) {
+                case 'top': {
+                  node.y -= value;
+                  break;
+                }
+                case 'center': {
+                  node.y -= value / 2;
+                  break;
+                }
+              }
+
+              break;
+            }
+          }
+        }
+      }
+
+      break;
+    }
+
+    // settings
     case 'loadSettings': {
+      openSectionsEdit();
+
       let settings = loadSettings()
         .then(settings => {
           settings.default = settingsDefault;
@@ -461,24 +771,35 @@ figma.ui.onmessage = msg => {
   }
 };
 
-figma.on('selectionchange', () => {
+function openSectionsEdit() {
   if (figma.currentPage.selection.length > 30) return;
 
   let shapeSectionNames = [];
 
   for (let node of figma.currentPage.selection) {
-    if (node.getPluginData(objectsData.pluginData.key) === objectsData.tube.pluginData.name) {
-      if (node.type === 'BOOLEAN_OPERATION') {
-        if (node.children[0].type === 'VECTOR') {
-          let vector = node.children[0],
-            path = vector.vectorPaths[0],
-            data = path.data,
-            dataArr = data.split(' ');
-
-          if (dataArr.length > 47) {
-            shapeSectionNames.push('tube');
+    switch (node.getPluginData(objectsData.pluginData.key)) {
+      // tube
+      case objectsData.tube.pluginData.name: {
+        if (node.type === 'BOOLEAN_OPERATION') {
+          if (node.children[0].type === 'VECTOR') {
+            let vector = node.children[0],
+              path = vector.vectorPaths[0],
+              data = path.data,
+              dataArr = data.split(' ');
+  
+            if (dataArr.length > 47) {
+              shapeSectionNames.push('tube');
+            }
           }
         }
+
+        break;
+      }
+
+      // cubic
+      case objectsData.cubic.pluginData.name: {
+        shapeSectionNames.push('cubic');
+        break;
       }
     }
   }
@@ -487,4 +808,8 @@ figma.on('selectionchange', () => {
     type: 'edit-shape',
     sections: shapeSectionNames
   });
+}
+
+figma.on('selectionchange', () => {
+  openSectionsEdit();
 });

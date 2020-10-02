@@ -67,10 +67,11 @@
 
   &-edit {
     z-index: 2;
+    margin: 0 0 6px 0;
     padding: 4px 10px;
     position: relative;
     border-radius: $mdc-border-radius;
-    background-color: Color(#fff, -6%);
+    background-color: Color(#fff, -10%);
 
     .mdc-input__label,
     input {
@@ -85,6 +86,14 @@
 
   &--back {
     opacity: 0;
+    pointer-events: none;
+  }
+
+  &__note {
+    font-size: 9px;
+    margin: 5px 0 0 0;
+    text-align: right;
+    user-select: none;
     pointer-events: none;
   }
 

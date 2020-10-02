@@ -11,6 +11,7 @@ const sectionOptions = {
 };
 
 function sectionEditAllClose() {
+  document.getElementById('open-edit-shape').classList.remove('show');
   [].forEach.call(document.querySelectorAll(`.${sectionOptions.stateClass.back}, .${sectionOptions.stateClass.modal}, .${sectionOptions.stateClass.edit}`), item => {
     item.classList.remove(sectionOptions.stateClass.back, sectionOptions.stateClass.edit, sectionOptions.stateClass.modal);
   });
