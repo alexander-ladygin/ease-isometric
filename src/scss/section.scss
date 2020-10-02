@@ -15,8 +15,8 @@
     padding-top: 15px;
     will-change: transform;
     box-sizing: border-box;
+    background-color: $color-body;
     @include wh(100%, fixed top left 150%);
-    background-color: rgba($color-body, 0.8);
 
     &__btn-close {
       $size:       18px;
@@ -61,7 +61,10 @@
     }
 
     &--show {
-      transform: translateX(-150%);
+      transform: scale(1) translateX(-150%);
+    }
+    &:not(#{'&--show'}) {
+      transform: scale(0) translateX(0);
     }
   }
 
@@ -80,7 +83,6 @@
 
     &:not(#{'&--show'}) {
       display: none;
-      @debug &;
     }
   }
 

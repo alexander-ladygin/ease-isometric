@@ -133,14 +133,16 @@ $width: 100 90 80 70 50 40 30 25 10;
   cursor: pointer;
   user-select: none;
   transition: 0.2s ease;
+  transition-delay: 0.2s;
   border-radius: $mdc-border-radius;
   background-color: Color(#fff, -20%);
   transform: translateX(0) scale(1);
 
   &:not(.show) {
-    opacity: 0.5;
+    opacity: 0;
     pointer-events: none;
-    transform: translateX(200px) scale(1);
+    transition-delay: 0s;
+    transform: translateX(0) scale(0.2);
   }
 
   &:hover {

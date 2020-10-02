@@ -269,6 +269,10 @@ function toGroup (nodes, options = {}) {
       group[prop] = options[prop];
     }
 
+    for (let node of nodes) {
+      inLayersBringTo(node, 'end');
+    }
+
     return group;
   }
 
@@ -418,6 +422,7 @@ figma.ui.onmessage = msg => {
         data: dataArr.join(' ')
       }];
 
+      tube.strokes = [];
       tube.fills = [{
         type: 'SOLID',
         opacity: 1,
@@ -430,6 +435,7 @@ figma.ui.onmessage = msg => {
         circleInnerSize = 0.7,
         circle = figma.createEllipse();
 
+      circle.strokes = [];
       circle.fills = [{
         type: 'SOLID',
         opacity: 1,
@@ -440,42 +446,47 @@ figma.ui.onmessage = msg => {
       circle.y = tube.y + 3;
       isometricTop(circle);
 
-      let circleOutline = figma.createEllipse();
+      let ring = figma.createEllipse();
 
-      circleOutline.fills = [];
-      circleOutline.strokes = [{
+      ring.fills = [];
+      ring.strokes = [{
         type: 'SOLID',
         opacity: 1,
         color: hexToRGB('#fff')
       }];
-      circleOutline.strokeAlign = 'INSIDE';
-      circleOutline.strokeWeight = 2;
-      circleOutline.resizeWithoutConstraints(circleSize, circleSize);
-      circleOutline.x = tube.x + (tubeWidth - circleSize) / 2;
-      circleOutline.y = tube.y - 9;
-      isometricTop(circleOutline);
+      ring.strokeAlign = 'INSIDE';
+      ring.strokeWeight = 2;
+      ring.resizeWithoutConstraints(circleSize, circleSize);
+      ring.x = tube.x + (tubeWidth - circleSize) / 2;
+      ring.y = tube.y - 9;
+      isometricTop(ring);
 
-      let boolop = figma.subtract([circleOutline, circle], tube.parent);
-      inLayersInsertTo([boolop], tube, 'before');
-      boolop.appendChild(tube);
+      let boolGroup = figma[msg.method]([ring, circle], tube.parent);
+      inLayersInsertTo([boolGroup], tube, 'before');
+      boolGroup.appendChild(tube);
       inLayersBringTo(tube, 'end');
+      if (msg.method === 'substract') boolGroup.fills = [{
+        type: 'SOLID',
+        opacity: 1,
+        color: hexToRGB('#000')
+      }];
 
       if (objectsData.appendToFrame && frameInSelection && frameInSelection.type === 'FRAME') {
-        frameInSelection.appendChild(boolop);
-        inLayersBringTo(boolop, 'start');
-        boolop.x = frameInSelection.width / 2 - boolop.width / 2;
-        boolop.y = frameInSelection.height / 2 - boolop.height / 2;
+        frameInSelection.appendChild(boolGroup);
+        inLayersBringTo(boolGroup, 'start');
+        boolGroup.x = frameInSelection.width / 2 - boolGroup.width / 2;
+        boolGroup.y = frameInSelection.height / 2 - boolGroup.height / 2;
       }
 
-      boolop.setPluginData(objectsData.pluginData.key, oData.pluginData.name);
-      figma.currentPage.selection = [boolop];
+      boolGroup.setPluginData(objectsData.pluginData.key, oData.pluginData.name);
+      figma.currentPage.selection = [boolGroup];
 
       break;
     }
     case 'object-tube-change': {
       for (let node of figma.currentPage.selection) {
         if (node.getPluginData(objectsData.pluginData.key) === objectsData.tube.pluginData.name) {
-          if (node.type === 'BOOLEAN_OPERATION') {
+          if ((node.type === 'BOOLEAN_OPERATION') || (node.type === 'GROUP')) {
             if (node.children[0].type === 'VECTOR') {
               let nodeHeight = node.height,
                 vector = node.children[0],
@@ -541,14 +552,16 @@ figma.ui.onmessage = msg => {
       let oData = objectsData.cubic,
         size = 50,
         sides = {
+          backright: figma.createRectangle(),
+          backleft: figma.createRectangle(),
           top: figma.createRectangle(),
           right: figma.createRectangle(),
           bottom: figma.createRectangle(),
           left: figma.createRectangle(),
         };
 
-      let colorValue = 100,
-        step = 15,
+      let colorValue = 70,
+        step = 20,
         counter = 1;
 
       for (let prop in sides) {
@@ -568,6 +581,8 @@ figma.ui.onmessage = msg => {
       isometricRight(sides.right);
       isometricBottom(sides.bottom);
       isometricLeft(sides.left);
+      isometricLeft(sides.backleft);
+      isometricRight(sides.backright);
 
 
       // align side left
@@ -576,6 +591,13 @@ figma.ui.onmessage = msg => {
         sidesLeftHeight = sideLeftGroup.height;
 
       sideLeftGroup.x -= sideLeftGroup.width;
+
+      let sideLeftGroupProps = {
+          x: sideLeftGroup.x,
+          y: sideLeftGroup.y,
+          w: sideLeftGroup.width,
+          h: sideLeftGroup.height,
+        };
       ungroup(sideLeftGroup);
 
 
@@ -598,14 +620,34 @@ figma.ui.onmessage = msg => {
 
       sideTopGroup.x = sidesBottomProps.x;
       sideTopGroup.y = sidesBottomProps.y - sideTopGroup.height;
+
+      let sideTopGroupProps = {
+        x: sideTopGroup.x,
+        y: sideTopGroup.y,
+        w: sideTopGroup.width,
+        h: sideTopGroup.height,
+      };
       ungroup(sideTopGroup);
 
+      // align side back right
+      let sideBackRightGroup = toGroup([sides.backright]);
+
+      sideBackRightGroup.x = sideLeftGroupProps.x;
+      sideBackRightGroup.y = sideTopGroupProps.y;
+      ungroup(sideBackRightGroup);
+
+      // align side back left
+      let sideBackLeftGroup = toGroup([sides.backleft]);
+
+      sideBackLeftGroup.y = sideTopGroupProps.y;
+      ungroup(sideBackLeftGroup);
+
       // group sides
-      let cubicGroup = toGroup([sides.top, sides.right, sides.bottom, sides.left], {
+      let cubicGroup = toGroup([sides.top, sides.right, sides.left, sides.bottom, sides.backright, sides.backleft], {
         name: objectsData.cubic.names.group
       });
 
-      inLayersBringTo(sides.bottom, 'end');
+      // inLayersBringTo(sides.bottom, 'end');
       cubicGroup.setPluginData(objectsData.pluginData.key, oData.pluginData.name);
       figma.currentPage.selection = [cubicGroup];
 
@@ -636,6 +678,17 @@ figma.ui.onmessage = msg => {
                     }
                     case 'bottom': {
                       side.resizeWithoutConstraints(side.width + value, side.height);
+                      if (msg.mode === '-') isometricMoveBottomRight([side], value);
+                        else isometricMoveTopLeft([side], value);
+                      break;
+                    }
+                    case 'backleft': {
+                      side.resizeWithoutConstraints(side.width + value, side.height);
+                      if (msg.mode === '-') isometricMoveBottomRight([side], value);
+                        else isometricMoveTopLeft([side], value);
+                      break;
+                    }
+                    case 'backright': {
                       if (msg.mode === '-') isometricMoveBottomRight([side], value);
                         else isometricMoveTopLeft([side], value);
                       break;
@@ -678,6 +731,15 @@ figma.ui.onmessage = msg => {
                         else isometricMoveTopRight([side], value);
                       break;
                     }
+                    case 'backleft': {
+                      if (msg.mode === '-') isometricMoveBottomLeft([side], value);
+                        else isometricMoveTopRight([side], value);
+                      break;
+                    }
+                    case 'backright': {
+                      side.resizeWithoutConstraints(side.width + value, side.height);
+                      break;
+                    }
                   }
                 }
               }
@@ -702,9 +764,6 @@ figma.ui.onmessage = msg => {
               if (node.type === 'GROUP') {
                 for (let side of node.children) {
                   switch (side.getPluginData(oData.pluginData.side)) {
-                    case 'top': {
-                      break;
-                    }
                     case 'right': {
                       side.resizeWithoutConstraints(side.width, side.height + value);
                       break;
@@ -714,6 +773,14 @@ figma.ui.onmessage = msg => {
                       break;
                     }
                     case 'left': {
+                      side.resizeWithoutConstraints(side.width, side.height + value);
+                      break;
+                    }
+                    case 'backleft': {
+                      side.resizeWithoutConstraints(side.width, side.height + value);
+                      break;
+                    }
+                    case 'backright': {
                       side.resizeWithoutConstraints(side.width, side.height + value);
                       break;
                     }
@@ -780,7 +847,7 @@ function openSectionsEdit() {
     switch (node.getPluginData(objectsData.pluginData.key)) {
       // tube
       case objectsData.tube.pluginData.name: {
-        if (node.type === 'BOOLEAN_OPERATION') {
+        if ((node.type === 'BOOLEAN_OPERATION') || (node.type === 'GROUP')) {
           if (node.children[0].type === 'VECTOR') {
             let vector = node.children[0],
               path = vector.vectorPaths[0],

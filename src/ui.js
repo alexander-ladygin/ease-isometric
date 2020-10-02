@@ -179,8 +179,15 @@ document.getElementById('edit-shape').addEventListener('mousewheel', function (e
 
 // object tube
 document.getElementById('object-tube').addEventListener('click', function (e) {
-  parent.postMessage({ pluginMessage: { type: this.id } }, '*');
+  parent.postMessage({ pluginMessage: { type: this.id, method: 'group' } }, '*');
   sectionOpen('edit-shape');
+});
+
+document.getElementById('object-tube').addEventListener('mouseup', function (e) {
+  if (e.which === 3) {
+    parent.postMessage({ pluginMessage: { type: this.id, method: 'subtract' } }, '*');
+    sectionOpen('edit-shape');
+  }
 });
 
 function objectTubeGetProps (mode) {
